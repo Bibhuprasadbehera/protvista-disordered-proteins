@@ -4,13 +4,13 @@
 #
 # Curated for structural biologists, medicinal chemists, and oncologists
 # studying tyrosine kinase inhibitor (TKI) binding modes, resistance
-# mutations (T790M, C797S), and structural coverage across PDB and AlphaFold.
+# mutations (T790M, C797S), and structural coverage across PDB.
 #
 # Attribution:
 #   - Drug contacts: PDBe ligand binding sites for P00533 (CC0),
 #     mapped to UniProt by SIFTS.
 #     Varadi M et al., Protein Sci. 2022;31(10):e4439.
-#   - UniProtKB (P00533, CC BY 4.0) & AlphaFold Protein Structure DB
+#   - UniProtKB (P00533, CC BY 4.0) & PDBe Knowledge Base
 # =====================================================================
 
 $schema: https://ebi-webcomponents.github.io/protvista/schema/v1/config.schema.json
@@ -19,7 +19,6 @@ accession: P00533
 
 sources:
   features: https://www.ebi.ac.uk/proteins/api/features/{accession}
-  alphafoldPrediction: https://alphafold.ebi.ac.uk/api/prediction/{accession}
 
 theme:
   labelColor: '#0f172a'
@@ -113,29 +112,28 @@ rows:
 
   # 2. Experimental Structure Coverage from PDB
   - id: STRUCTURE_COVERAGE
-    label: PDB Structure Coverage
+    label: PDB Secondary Structure Coverage
     tracks:
-      - id: structure
-        label: Solved PDB Structures
+      - id: helix
+        label: Alpha Helix
         kind: features
         filter: HELIX
         data: features
-        description: Secondary structures experimentally solved by X-ray and Cryo-EM
+        description: Experimentally solved helical segments in PDB structures
+      - id: strand
+        label: Beta Strand
+        kind: features
+        filter: STRAND
+        data: features
+        description: Experimentally solved beta sheet strands in PDB structures
+      - id: turn
+        label: Turn
+        kind: features
+        filter: TURN
+        data: features
+        description: Solved turn motifs in PDB structures
 
-  # 3. AlphaFold Model Confidence (pLDDT)
-  - id: ALPHAFOLD_CONFIDENCE
-    label: AlphaFold Model Confidence (pLDDT)
-    rendering:
-      colorScale:
-        theme: alphafold-ramp
-    tracks:
-      - id: alphafold_confidence
-        label: '[AlphaFold Confidence](https://alphafold.ebi.ac.uk/entry/{accession})'
-        kind: alphafold-confidence
-        data: alphafoldPrediction
-        description: Per-residue pLDDT confidence scores from AlphaFold2
-
-  # 4. Canonical Domain Architecture
+  # 3. Canonical Domain Architecture
   - id: DOMAINS
     label: Domains & Transmembrane Topology
     tracks:
@@ -153,7 +151,7 @@ rows:
         data: features
         description: Helical transmembrane anchor segment
 
-  # 5. Critical Functional Sites & Active Center
+  # 4. Critical Functional Sites & Active Center
   - id: SITES
     label: Catalytic & Active Sites
     tracks:
