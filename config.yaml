@@ -1,30 +1,172 @@
-# This is your viewer. Edit this file, save it, reload the page.
+# =====================================================================
+# Community Preset: Structural Biology and Drug Discovery
+# Focus: Epidermal Growth Factor Receptor (EGFR / P00533, 1,210 aa)
 #
-# `accession:` is the UniProt entry the viewer is built around. The
-# component fetches that protein's sequence before it draws anything,
-# so, unless you use `sequence:` instead (see below), this field is
-# required even when every track is a local file — which also means the
-# page needs internet access even for your own offline data. For a
-# protein that isn't in UniProt, replace it with `sequence:` (a FASTA
-# file such as ./data/my-protein.fasta, or the residues themselves):
-# the viewer then makes no request of its own.
+# Curated for structural biologists, medicinal chemists, and oncologists
+# studying tyrosine kinase inhibitor (TKI) binding modes, resistance
+# mutations (T790M, C797S), and structural coverage across PDB and AlphaFold.
 #
-# `rows:` is what to draw. Each entry is either a group of tracks or,
-# as here, a single standalone track: an entry with `data:` and no
-# `tracks:` needs no group wrapper. A `data:` path ending in `.csv` or
-# `.tsv` picks the right parser for you — no `adapter:` needed.
-#
-# Paths in `data:` are resolved against THIS PAGE, not against this
-# file. They start from the folder that holds index.html, which is why
-# the sample below says `./data/...` and not `./hotspots.csv`.
-#
-# Every field a config can hold:
-# https://ebi-webcomponents.github.io/protvista/configure
+# Attribution:
+#   - Drug contacts: PDBe ligand binding sites for P00533 (CC0),
+#     mapped to UniProt by SIFTS.
+#     Varadi M et al., Protein Sci. 2022;31(10):e4439.
+#   - UniProtKB (P00533, CC BY 4.0) & AlphaFold Protein Structure DB
+# =====================================================================
+
 $schema: https://ebi-webcomponents.github.io/protvista/schema/v1/config.schema.json
-accession: P05067
+version: '1.0'
+accession: P00533
+
+sources:
+  features: https://www.ebi.ac.uk/proteins/api/features/{accession}
+  alphafoldPrediction: https://alphafold.ebi.ac.uk/api/prediction/{accession}
+
+theme:
+  labelColor: '#0f172a'
+  accentColor: '#0284c7'
+
 rows:
-  - id: hotspots
-    label: Hotspots
-    kind: features
-    data: ./data/hotspots.csv
-    description: Hotspot regions identified by our lab's pipeline
+  # 1. PDB Co-crystal Drug Contacts (Top priority for drug discovery)
+  # One track per drug via filter:, comparing 1st-, 2nd-, and 3rd-generation TKIs
+  - id: DRUG_CONTACTS
+    label: PDBe Co-crystal Drug Contacts
+    tracks:
+      - id: osimertinib
+        label: Osimertinib (3rd-gen TKI)
+        kind: features
+        filter: OSIMERTINIB
+        data: ./data/drug-contacts.csv
+        description: 3rd-generation irreversible mutant-selective TKI (covalent to Cys797)
+        rendering:
+          color: '#e11d48'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: gefitinib
+        label: Gefitinib (1st-gen TKI)
+        kind: features
+        filter: GEFITINIB
+        data: ./data/drug-contacts.csv
+        description: 1st-generation ATP-competitive reversible TKI
+        rendering:
+          color: '#0284c7'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: erlotinib
+        label: Erlotinib (1st-gen TKI)
+        kind: features
+        filter: ERLOTINIB
+        data: ./data/drug-contacts.csv
+        description: 1st-generation ATP-competitive reversible TKI
+        rendering:
+          color: '#0d9488'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: afatinib
+        label: Afatinib (2nd-gen TKI)
+        kind: features
+        filter: AFATINIB
+        data: ./data/drug-contacts.csv
+        description: 2nd-generation irreversible ErbB family blocker
+        rendering:
+          color: '#7c3aed'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: dacomitinib
+        label: Dacomitinib (2nd-gen TKI)
+        kind: features
+        filter: DACOMITINIB
+        data: ./data/drug-contacts.csv
+        description: 2nd-generation irreversible pan-HER TKI
+        rendering:
+          color: '#9333ea'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: lapatinib
+        label: Lapatinib (Dual TKI)
+        kind: features
+        filter: LAPATINIB
+        data: ./data/drug-contacts.csv
+        description: Dual EGFR/ErbB2 reversible inhibitor (binds inactive conformation)
+        rendering:
+          color: '#d97706'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: neratinib
+        label: Neratinib (Pan-HER TKI)
+        kind: features
+        filter: NERATINIB
+        data: ./data/drug-contacts.csv
+        description: Irreversible pan-HER tyrosine kinase inhibitor
+        rendering:
+          color: '#b45309'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+      - id: amp_pnp
+        label: AMP-PNP (ATP Pocket Reference)
+        kind: features
+        filter: AMP_PNP
+        data: ./data/drug-contacts.csv
+        description: Non-hydrolyzable ATP analogue mapping canonical kinase pocket
+        rendering:
+          color: '#64748b'
+        dataTooltip: '**{% $drug %}** contacts **{% $residue %}** ({% $start %}) in {% $n_structures %} PDB entries. [View PDBe](<{% $url %}>)'
+
+  # 2. Experimental Structure Coverage from PDB
+  - id: STRUCTURE_COVERAGE
+    label: PDB Structure Coverage
+    tracks:
+      - id: structure
+        label: Solved PDB Structures
+        kind: features
+        filter: HELIX
+        data: features
+        description: Secondary structures experimentally solved by X-ray and Cryo-EM
+
+  # 3. AlphaFold Model Confidence (pLDDT)
+  - id: ALPHAFOLD_CONFIDENCE
+    label: AlphaFold Model Confidence (pLDDT)
+    rendering:
+      colorScale:
+        theme: alphafold-ramp
+    tracks:
+      - id: alphafold_confidence
+        label: '[AlphaFold Confidence](https://alphafold.ebi.ac.uk/entry/{accession})'
+        kind: alphafold-confidence
+        data: alphafoldPrediction
+        description: Per-residue pLDDT confidence scores from AlphaFold2
+
+  # 4. Canonical Domain Architecture
+  - id: DOMAINS
+    label: Domains & Transmembrane Topology
+    tracks:
+      - id: domain
+        label: Protein Domains
+        kind: features
+        filter: DOMAIN
+        data: features
+        description: Receptor L, furin-like cysteine-rich, and protein kinase domains
+
+      - id: transmem
+        label: Transmembrane Region
+        kind: features
+        filter: TRANSMEM
+        data: features
+        description: Helical transmembrane anchor segment
+
+  # 5. Critical Functional Sites & Active Center
+  - id: SITES
+    label: Catalytic & Active Sites
+    tracks:
+      - id: active_site
+        label: Active Sites & ATP Binding
+        kind: features
+        filter: ACT_SITE
+        data: features
+        description: Catalytic residues essential for kinase activity
+
+      - id: binding_site
+        label: Binding Sites
+        kind: features
+        filter: BINDING
+        data: features
+        description: Documented substrate and cofactor binding residues
